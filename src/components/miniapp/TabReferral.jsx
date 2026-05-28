@@ -89,7 +89,7 @@ export default function TabReferral() {
       <div className="grid grid-cols-3 gap-3 mb-5">
         {stats.map((stat, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springConfig, delay: i * 0.07 }}
-            className="p-3 rounded-2xl" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+            className="p-3 rounded-2xl" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
             <div className="w-7 h-7 rounded-xl flex items-center justify-center mb-2" style={{ background: `${stat.color}20` }}>
               <stat.icon size={14} color={stat.color} />
             </div>
@@ -101,7 +101,7 @@ export default function TabReferral() {
 
       {/* Chart */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="p-4 rounded-3xl mb-5" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+        className="p-4 rounded-3xl mb-5" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold" style={{ color: primaryText }}>Доход</span>
           <div className="flex gap-1 flex-wrap">
@@ -135,7 +135,7 @@ export default function TabReferral() {
 
       {/* Referral link */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-        className="p-4 rounded-2xl mb-4" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+        className="p-4 rounded-2xl mb-4" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
         <div className="text-xs mb-2 font-medium" style={{ color: secondaryText }}>Ваша реферальная ссылка</div>
         <div className="flex items-center gap-2">
           <div className="flex-1 px-3 py-2 rounded-xl text-xs font-mono truncate"
@@ -152,7 +152,7 @@ export default function TabReferral() {
 
       {/* Banner download */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-        className="p-4 rounded-2xl mb-4" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+        className="p-4 rounded-2xl mb-4" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
         <div className="flex items-center gap-2 mb-3">
           <Image size={14} color="#5E5CE6" />
           <span className="text-xs font-semibold" style={{ color: primaryText }}>Баннеры для залива трафика</span>

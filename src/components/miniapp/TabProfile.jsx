@@ -275,7 +275,7 @@ export default function TabProfile() {
               exit={{ opacity: 0, y: '100%' }}
               transition={springConfig}
               className="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl"
-              style={{ background: isLight ? 'rgba(242,242,247,0.99)' : 'rgba(18,18,20,0.99)', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '80vh' }}
+              style={{ background: isLight ? 'rgba(242,242,247,0.99)' : 'rgba(18,18,20,0.99)', border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)', maxHeight: '80vh' }}
             >
               <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: isLight ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.07)' }}>
                 <h3 className="text-base font-bold" style={{ color: primaryText }}>{t(lang, openLegal.key)}</h3>

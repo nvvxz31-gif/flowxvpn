@@ -276,7 +276,7 @@ export default function TabPlans() {
       )}
 
       <div className="mb-3">
-        <div className="p-4 rounded-3xl" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+        <div className="p-4 rounded-3xl" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-base font-bold" style={{ color: primaryText }}>{paidPlan?.name || 'Basic'}</span>
             <div className="text-right">

@@ -66,8 +66,8 @@ export default function BalanceCapsule() {
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
         style={{
-          background: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(28,28,30,0.85)',
-          backdropFilter: 'blur(20px)',
+          background: isLight ? 'rgba(255,255,255,0.98)' : 'rgba(28,28,30,0.85)',
+          backdropFilter: isLight ? 'none' : 'blur(20px)',
           border: isLight ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.1)',
         }}
       >
@@ -90,7 +90,7 @@ export default function BalanceCapsule() {
               exit={{ opacity: 0, y: 60, scale: 0.95 }}
               transition={springConfig}
               className="fixed bottom-0 left-0 right-0 z-50 p-6 rounded-t-3xl overflow-y-auto"
-              style={{ background: modalBg, backdropFilter: 'blur(24px)', border: modalBorder, maxHeight: '90vh' }}
+              style={{ background: modalBg, backdropFilter: isLight ? 'none' : 'blur(24px)', border: modalBorder, maxHeight: '90vh' }}
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-semibold" style={{ color: primaryText }}>Пополнить баланс</h3>

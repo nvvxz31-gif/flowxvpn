@@ -109,7 +109,7 @@ export default function TabConnections() {
       <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={springConfig}
         className="p-6 rounded-3xl mb-4"
-        style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}
+        style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -223,7 +223,7 @@ export default function TabConnections() {
               style={{
                 background: platformBtnBg || cardBg,
                 border: activePlatform === p.platform ? '1px solid rgba(10,132,255,0.4)' : cardBorder,
-                backdropFilter: 'blur(20px)',
+                backdropFilter: isLight ? 'none' : 'blur(20px)',
               }}
             >
               <div className="text-xl mb-1">{p.icon}</div>
@@ -238,7 +238,7 @@ export default function TabConnections() {
           {activePlatform && (
             <motion.div key={activePlatform} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
               className="mb-3 p-3 rounded-2xl"
-              style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}
+              style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}
             >
               <p className="text-xs mb-2" style={{ color: secondaryText }}>Выберите приложение для <span style={{ color: primaryText }}>{activePlatform}</span></p>
               <div className="grid grid-cols-2 gap-2">
@@ -265,7 +265,7 @@ export default function TabConnections() {
         {/* FAQ */}
         <div className="flex flex-col gap-2 mb-3">
           {faq.map((item, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
+            <div key={i} className="rounded-2xl overflow-hidden" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
               <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-3.5 text-left">
                 <span className="text-sm font-medium pr-3" style={{ color: primaryText }}>{item.q}</span>
                 <motion.div animate={{ rotate: openFaq === i ? 180 : 0 }} transition={springConfig} className="flex-shrink-0">
@@ -293,7 +293,7 @@ export default function TabConnections() {
               onClick={() => setActiveGuide(null)} />
             <motion.div initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 60 }} transition={springConfig}
               className="fixed bottom-0 left-0 right-0 z-50 p-6 rounded-t-3xl overflow-y-auto"
-              style={{ background: isLight ? 'rgba(242,242,247,0.99)' : 'rgba(22,22,24,0.99)', border: '1px solid rgba(255,255,255,0.1)', maxHeight: '85vh' }}
+              style={{ background: isLight ? 'rgba(242,242,247,0.99)' : 'rgba(22,22,24,0.99)', border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.1)', maxHeight: '85vh' }}
             >
               <div className="flex items-center justify-between mb-5">
                 <div>
