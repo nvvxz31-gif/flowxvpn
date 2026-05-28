@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
+import { useApp } from '@/lib/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, CreditCard, Users, User, QrCode, History, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 import UserDashboard from './UserDashboard';
@@ -31,13 +32,15 @@ const content = {
 
 export default function UserPanelLayout() {
   const { logout } = useAuth();
+  const { theme } = useApp();
+  const isLight = theme === 'light';
   const [active, setActive] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const activeItem = navItems.find(n => n.id === active);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#0D0D0F' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: isLight ? '#F2F2F7' : '#0D0D0F' }}>
       {/* Desktop sidebar */}
       <div
         className="hidden md:flex w-56 h-screen flex-col py-6 flex-shrink-0"
