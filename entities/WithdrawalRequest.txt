@@ -1,0 +1,39 @@
+{
+  "name": "WithdrawalRequest",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "amount_rub": {
+      "type": "number"
+    },
+    "method": {
+      "type": "string"
+    },
+    "wallet_address": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "admin_note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "amount_rub",
+    "method",
+    "wallet_address"
+  ]
+}

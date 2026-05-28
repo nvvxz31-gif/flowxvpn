@@ -1,0 +1,55 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "amount_rub": {
+      "type": "number"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "sbp",
+        "card",
+        "crypto",
+        "cryptobot",
+        "stars"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "pending",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "months": {
+      "type": "number",
+      "default": 1
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "subscription_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "amount_rub",
+    "status"
+  ]
+}

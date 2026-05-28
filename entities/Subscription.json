@@ -1,0 +1,62 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "telegram_username": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "trial",
+        "expired",
+        "banned"
+      ],
+      "default": "trial"
+    },
+    "traffic_used_gb": {
+      "type": "number",
+      "default": 0
+    },
+    "traffic_total_gb": {
+      "type": "number",
+      "default": 50
+    },
+    "expires_at": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "vpn_config": {
+      "type": "string"
+    },
+    "months_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "balance_rub": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "user_email",
+    "plan_name",
+    "status",
+    "expires_at"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "name": "Plan",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "price_rub": {
+      "type": "number"
+    },
+    "traffic_gb": {
+      "type": "number"
+    },
+    "days": {
+      "type": "number"
+    },
+    "is_trial": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    },
+    "durations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "months": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "discount": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "price_rub"
+  ]
+}

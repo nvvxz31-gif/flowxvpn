@@ -1,0 +1,31 @@
+{
+  "name": "ReferralCode",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "referral_count": {
+      "type": "number",
+      "default": 0
+    },
+    "total_earned_rub": {
+      "type": "number",
+      "default": 0
+    },
+    "pending_balance_rub": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "user_email",
+    "code"
+  ]
+}
