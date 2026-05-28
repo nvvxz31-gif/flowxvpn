@@ -144,7 +144,6 @@ export default function TabPlans() {
 
   const createTrial = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
       const trialExpiry = new Date();
       trialExpiry.setDate(trialExpiry.getDate() + (trialPlan?.days || 7));
       try {

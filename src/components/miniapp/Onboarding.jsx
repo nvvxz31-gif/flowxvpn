@@ -11,11 +11,11 @@ export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  const screens = [
-    <OnboardingScreen1 key={0} />,
-    <OnboardingScreen2 key={1} />,
-    <OnboardingScreen3 key={2} />,
-    <OnboardingScreen4 key={3} onComplete={onComplete} />,
+  const screenComponents = [
+    OnboardingScreen1,
+    OnboardingScreen2,
+    OnboardingScreen3,
+    OnboardingScreen4,
   ];
 
   const goNext = () => {
@@ -73,7 +73,7 @@ export default function Onboarding({ onComplete }) {
           className="absolute inset-0 flex flex-col"
           style={{ paddingBottom: '72px' }}
         >
-          {screens[step]}
+          {React.createElement(screenComponents[step], step === 3 ? { onComplete } : {})}
         </motion.div>
       </AnimatePresence>
 
