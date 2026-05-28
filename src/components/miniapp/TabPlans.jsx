@@ -171,7 +171,6 @@ export default function TabPlans() {
   });
 
   const createPayment = async (method) => {
-    if (!user) return;
     const planName = paidPlan?.name || 'Basic';
     const price = selected?.price || 99;
     const months = selected?.months || 1;
@@ -263,8 +262,8 @@ export default function TabPlans() {
               ))}
             </div>
             <button
-              onClick={() => !trialDone && user && createTrial.mutate()}
-              disabled={createTrial.isPending || trialDone || !user}
+              onClick={() => !trialDone && createTrial.mutate()}
+              disabled={createTrial.isPending || trialDone}
               className="w-full py-3 rounded-xl font-semibold text-sm text-white flex items-center justify-center gap-2"
               style={{ background: trialDone ? 'rgba(48,209,88,0.3)' : 'linear-gradient(135deg, #0A84FF, #5E5CE6)', boxShadow: '0 4px 15px rgba(10,132,255,0.3)' }}>
               {createTrial.isPending
@@ -320,7 +319,7 @@ export default function TabPlans() {
             ))}
           </div>
           <button
-            onClick={() => user && setPaymentModal({ plan: `${paidPlan?.name || 'Basic'} · ${selected?.months || 1} мес`, price: selected?.price || 99, months: selected?.months || 1 })}
+            onClick={() => setPaymentModal({ plan: `${paidPlan?.name || 'Basic'} · ${selected?.months || 1} мес`, price: selected?.price || 99, months: selected?.months || 1 })}
             className="w-full py-3 rounded-xl font-semibold text-sm text-white"
             style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
             {isActive ? 'Продлить подписку' : 'Выбрать тариф'}
