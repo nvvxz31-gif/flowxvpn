@@ -111,7 +111,16 @@ export default function TabPlans() {
 
   const { data: plans = [] } = useQuery({
     queryKey: ['plans-active'],
-    queryFn: () => base44.entities.Plan.filter({ is_active: true }, 'sort_order', 10),
+    queryFn: async () => {
+      try {
+        return await base44.entities.Plan.filter({ is_active: true }, 'sort_order', 10);
+      } catch {
+        return [
+          { is_trial: true, name: 'Пробный', traffic_gb: 50, days: 7, is_active: true },
+          { is_trial: false, name: 'Basic', traffic_gb: 300, price_rub: 99, is_active: true },
+        ];
+      }
+    },
   });
 
   const trialPlan = plans.find(p => p.is_trial);
