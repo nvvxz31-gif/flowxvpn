@@ -15,6 +15,13 @@ const PAYMENT_METHODS = [
   { id: 'stars', label: 'Telegram Stars', icon: 'https://media.base44.com/images/public/6a088498feb97a4eaded517d/8177385e9_img_2337.jpg' },
 ];
 
+const FALLBACK_DURATIONS = [
+  { months: 1, price: 99, discount: null },
+  { months: 3, price: 249, discount: 15 },
+  { months: 6, price: 449, discount: 25 },
+  { months: 12, price: 899, discount: 35 },
+];
+
 function PaymentModal({ plan, price, months, onClose, onPay }) {
   const { theme } = useApp();
   const isLight = theme === 'light';
@@ -113,7 +120,8 @@ export default function TabPlans() {
     queryKey: ['plans-active'],
     queryFn: async () => {
       try {
-        return await base44.entities.Plan.filter({ is_active: true }, 'sort_order', 10);
+        const result = await base44.entities.Plan.filter({ is_active: true }, 'sort_order', 10);
+        return Array.isArray(result) ? result : [];
       } catch {
         return [
           { is_trial: true, name: 'Пробный', traffic_gb: 50, days: 7, is_active: true },
@@ -123,15 +131,16 @@ export default function TabPlans() {
     },
   });
 
-  const trialPlan = plans.find(p => p.is_trial);
-  const paidPlan = plans.find(p => !p.is_trial);
-  const durations = paidPlan?.durations?.length > 0 ? paidPlan.durations : [
-    { months: 1, price: 99, discount: null },
-    { months: 3, price: 249, discount: 15 },
-    { months: 6, price: 449, discount: 25 },
-    { months: 12, price: 899, discount: 35 },
-  ];
-  const selected = durations.find(d => d.months === selectedMonths) || durations[0];
+  const safePlans = Array.isArray(plans) ? plans : [];
+  const trialPlan = safePlans.find(p => p?.is_trial) || { name: 'Пробный', traffic_gb: 50, days: 7 };
+  const paidPlan = safePlans.find(p => !p?.is_trial) || { name: 'Basic', traffic_gb: 300, price_rub: 99 };
+
+  const durations = (Array.isArray(paidPlan?.durations) && paidPlan.durations.length > 0)
+    ? paidPlan.durations
+    : FALLBACK_DURATIONS;
+
+  const safeDurations = Array.isArray(durations) ? durations : FALLBACK_DURATIONS;
+  const selected = safeDurations.find(d => d.months === selectedMonths) || safeDurations[0];
 
   const createTrial = useMutation({
     mutationFn: async () => {
@@ -152,7 +161,6 @@ export default function TabPlans() {
           balance_rub: 0,
         });
       } catch {
-        // API unavailable — simulate success locally
         return { status: 'trial' };
       }
     },
@@ -196,7 +204,7 @@ export default function TabPlans() {
       qc.invalidateQueries({ queryKey: ['my-subscription'] });
       qc.invalidateQueries({ queryKey: ['my-transactions'] });
     } catch {
-      // API unavailable — payment request accepted locally
+      // API unavailable — accepted locally
     }
   };
 
@@ -219,7 +227,6 @@ export default function TabPlans() {
       </h1>
       <p className="text-sm mb-6" style={{ color: secondaryText }}>Выберите подходящий план</p>
 
-      {/* Current subscription banner */}
       {hasSub && (
         <div className="mb-4 p-3 rounded-2xl flex items-center gap-3"
           style={{ background: isActive ? 'rgba(48,209,88,0.08)' : 'rgba(10,132,255,0.08)', border: isActive ? '1px solid rgba(48,209,88,0.25)' : '1px solid rgba(10,132,255,0.25)' }}>
@@ -231,7 +238,6 @@ export default function TabPlans() {
         </div>
       )}
 
-      {/* Trial card */}
       {!isTrialActive && !isActive && (
         <div className="mb-3">
           <div className="p-4 rounded-3xl" style={{ background: isLight ? 'rgba(10,132,255,0.06)' : 'rgba(10,132,255,0.08)', border: '1px solid rgba(10,132,255,0.35)' }}>
@@ -271,7 +277,6 @@ export default function TabPlans() {
         </div>
       )}
 
-      {/* Basic plan */}
       <div className="mb-3">
         <div className="p-4 rounded-3xl" style={{ background: cardBg, border: cardBorder, backdropFilter: 'blur(20px)' }}>
           <div className="flex items-center justify-between mb-2">
@@ -294,9 +299,8 @@ export default function TabPlans() {
               <span key={i} className="text-xs px-2 py-0.5 rounded-full" style={{ background: tagBg, color: secondaryText }}>{f}</span>
             ))}
           </div>
-          {/* Duration selector */}
           <div className="flex gap-2 mb-4" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: '12px', paddingTop: '10px' }}>
-            {durations.map((d) => (
+            {safeDurations.map((d) => (
               <button key={d.months} onClick={() => setSelectedMonths(d.months)}
                 className="flex-shrink-0 flex flex-col items-center rounded-2xl relative"
                 style={{
