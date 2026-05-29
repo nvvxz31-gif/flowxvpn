@@ -101,8 +101,8 @@ export default function UserConnect() {
         <h3 className="text-sm font-semibold mb-3" style={{ color: primaryText }}>QR-код для подключения</h3>
         <div className="flex items-center justify-center py-6 rounded-2xl mb-3"
           style={{ background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)', border: isLight ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="bg-white p-3 rounded-2xl">
-            <QrCode size={120} color="#0D0D0F" />
+          <div className="p-3 rounded-2xl" style={{ background: isLight ? '#0D0D0F' : '#FFFFFF' }}>
+            <QrCode size={120} color={isLight ? '#FFFFFF' : '#0D0D0F'} />
           </div>
         </div>
         <p className="text-xs text-center" style={{ color: secondaryText }}>Отсканируйте QR-код в приложении Happ или V2Ray</p>
