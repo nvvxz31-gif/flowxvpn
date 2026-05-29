@@ -110,7 +110,9 @@ export default function TabPlans() {
   const isLight = theme === 'light';
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [selectedMonths, setSelectedMonths] = useState(1);
+  const [selectedMonths, setSelectedMonths] = useState({});
+  const getMonths = (idx) => selectedMonths[idx] || 1;
+  const setMonths = (idx, m) => setSelectedMonths(prev => ({ ...prev, [idx]: m }));
   const [paymentModal, setPaymentModal] = useState(null);
   const [trialDone, setTrialDone] = useState(() => !!localStorage.getItem('flowx_trial_done'));
 
@@ -125,7 +127,9 @@ export default function TabPlans() {
       } catch {
         return [
           { is_trial: true, name: 'Пробный', traffic_gb: 50, days: 7, is_active: true },
-          { is_trial: false, name: 'Basic', traffic_gb: 300, price_rub: 99, is_active: true },
+          { is_trial: false, name: 'Basic', traffic_gb: 100, price_rub: 99, is_active: true },
+          { is_trial: false, name: 'Pro', traffic_gb: 300, price_rub: 249, is_active: true },
+          { is_trial: false, name: 'Ultra', traffic_gb: 1000, price_rub: 499, is_active: true },
         ];
       }
     },
@@ -133,14 +137,13 @@ export default function TabPlans() {
 
   const safePlans = Array.isArray(plans) ? plans : [];
   const trialPlan = safePlans.find(p => p?.is_trial) || { name: 'Пробный', traffic_gb: 50, days: 7 };
-  const paidPlan = safePlans.find(p => !p?.is_trial) || { name: 'Basic', traffic_gb: 300, price_rub: 99 };
-
-  const durations = (Array.isArray(paidPlan?.durations) && paidPlan.durations.length > 0)
-    ? paidPlan.durations
-    : FALLBACK_DURATIONS;
-
-  const safeDurations = Array.isArray(durations) ? durations : FALLBACK_DURATIONS;
-  const selected = safeDurations.find(d => d.months === selectedMonths) || safeDurations[0];
+  const paidPlans = safePlans.filter(p => !p?.is_trial).length > 0
+    ? safePlans.filter(p => !p?.is_trial)
+    : [
+        { name: 'Basic', traffic_gb: 100, price_rub: 99 },
+        { name: 'Pro', traffic_gb: 300, price_rub: 249 },
+        { name: 'Ultra', traffic_gb: 1000, price_rub: 499 },
+      ];
 
   const createTrial = useMutation({
     mutationFn: async () => {
@@ -170,10 +173,7 @@ export default function TabPlans() {
     },
   });
 
-  const createPayment = async (method) => {
-    const planName = paidPlan?.name || 'Basic';
-    const price = selected?.price || 99;
-    const months = selected?.months || 1;
+  const createPayment = async (method, planName, price, months, planTrafficGb) => {
     try {
       await base44.entities.Transaction.create({
         user_email: user.email,
@@ -193,7 +193,7 @@ export default function TabPlans() {
           plan_name: planName,
           status: 'trial',
           traffic_used_gb: 0,
-          traffic_total_gb: paidPlan?.traffic_gb || 300,
+          traffic_total_gb: planTrafficGb || 300,
           expires_at: expiry.toISOString(),
           started_at: new Date().toISOString(),
           months_paid: 0,
@@ -276,56 +276,65 @@ export default function TabPlans() {
         </div>
       )}
 
-      <div className="mb-3">
-        <div className="p-4 rounded-3xl" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-bold" style={{ color: primaryText }}>{paidPlan?.name || 'Basic'}</span>
-            <div className="text-right">
-              <span className="text-xl font-bold" style={{ color: primaryText }}>₽ {selected?.price || 99}</span>
-              <div className="text-xs" style={{ color: secondaryText }}>/ {selected?.months || 1} мес</div>
+      {paidPlans.map((plan, idx) => {
+        const planDurations = (Array.isArray(plan?.durations) && plan.durations.length > 0)
+          ? plan.durations
+          : FALLBACK_DURATIONS;
+        const currentMonths = getMonths(idx);
+        const selectedDur = planDurations.find(d => d.months === currentMonths) || planDurations[0];
+        return (
+          <div key={plan.id || idx} className="mb-3">
+            <div className="p-4 rounded-3xl" style={{ background: cardBg, border: cardBorder, backdropFilter: isLight ? 'none' : 'blur(20px)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-base font-bold" style={{ color: primaryText }}>{plan?.name || 'Basic'}</span>
+                <div className="text-right">
+                  <span className="text-xl font-bold" style={{ color: primaryText }}>₽ {selectedDur?.price || plan?.price_rub || 99}</span>
+                  <div className="text-xs" style={{ color: secondaryText }}>/ {selectedDur?.months || 1} мес</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1" style={{ background: 'rgba(10,132,255,0.12)', color: primaryText, border: '1px solid rgba(10,132,255,0.2)' }}>
+                  <span style={{ color: '#0A84FF' }}>⚡</span> {plan?.traffic_gb || 300} ГБ
+                </span>
+                <span className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1" style={{ background: 'rgba(94,92,230,0.12)', color: primaryText, border: '1px solid rgba(94,92,230,0.2)' }}>
+                  <span style={{ color: '#5E5CE6' }}>∞</span> Устройств
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {['🇳🇱 Нидерланды', '🇩🇪 Германия', '🇫🇮 Финляндия', '+ и другие серверы', '🇷🇺✅ Белые списки'].map((f, i) => (
+                  <span key={i} className="text-xs px-2 py-0.5 rounded-full" style={{ background: tagBg, color: secondaryText }}>{f}</span>
+                ))}
+              </div>
+              <div className="flex gap-2 mb-4" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: '12px', paddingTop: '10px' }}>
+                {planDurations.map((d) => (
+                  <button key={d.months} onClick={() => setMonths(idx, d.months)}
+                    className="flex-shrink-0 flex flex-col items-center rounded-2xl relative"
+                    style={{
+                      background: currentMonths === d.months ? 'rgba(10,132,255,0.18)' : durationBg,
+                      border: currentMonths === d.months ? '1px solid rgba(10,132,255,0.45)' : `1px solid ${durationBorder}`,
+                      minWidth: '76px', padding: '10px 12px', marginTop: '6px',
+                    }}>
+                    {d.discount && (
+                      <div className="absolute flex items-center justify-center rounded-full font-bold"
+                        style={{ top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)', color: 'white', fontSize: '9px', padding: '2px 6px', whiteSpace: 'nowrap', borderRadius: '100px' }}>
+                        -{d.discount}%
+                      </div>
+                    )}
+                    <span className="text-xs font-semibold" style={{ color: currentMonths === d.months ? '#0A84FF' : secondaryText }}>{d.months} мес</span>
+                    <span className="text-sm font-bold mt-0.5" style={{ color: currentMonths === d.months ? primaryText : secondaryText }}>₽{d.price}</span>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setPaymentModal({ plan: `${plan?.name || 'Basic'} · ${selectedDur?.months || 1} мес`, price: selectedDur?.price || plan?.price_rub || 99, months: selectedDur?.months || 1, planTrafficGb: plan?.traffic_gb || 300 })}
+                className="w-full py-3 rounded-xl font-semibold text-sm text-white"
+                style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
+                {isActive ? 'Продлить подписку' : 'Выбрать тариф'}
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1" style={{ background: 'rgba(10,132,255,0.12)', color: primaryText, border: '1px solid rgba(10,132,255,0.2)' }}>
-              <span style={{ color: '#0A84FF' }}>⚡</span> {paidPlan?.traffic_gb || 300} ГБ
-            </span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1" style={{ background: 'rgba(94,92,230,0.12)', color: primaryText, border: '1px solid rgba(94,92,230,0.2)' }}>
-              <span style={{ color: '#5E5CE6' }}>∞</span> Устройств
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {['🇳🇱 Нидерланды', '🇩🇪 Германия', '🇫🇮 Финляндия', '+ и другие серверы', '🇷🇺✅ Белые списки'].map((f, i) => (
-              <span key={i} className="text-xs px-2 py-0.5 rounded-full" style={{ background: tagBg, color: secondaryText }}>{f}</span>
-            ))}
-          </div>
-          <div className="flex gap-2 mb-4" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: '12px', paddingTop: '10px' }}>
-            {safeDurations.map((d) => (
-              <button key={d.months} onClick={() => setSelectedMonths(d.months)}
-                className="flex-shrink-0 flex flex-col items-center rounded-2xl relative"
-                style={{
-                  background: selectedMonths === d.months ? 'rgba(10,132,255,0.18)' : durationBg,
-                  border: selectedMonths === d.months ? '1px solid rgba(10,132,255,0.45)' : `1px solid ${durationBorder}`,
-                  minWidth: '76px', padding: '10px 12px', marginTop: '6px',
-                }}>
-                {d.discount && (
-                  <div className="absolute flex items-center justify-center rounded-full font-bold"
-                    style={{ top: '-10px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)', color: 'white', fontSize: '9px', padding: '2px 6px', whiteSpace: 'nowrap', borderRadius: '100px' }}>
-                    -{d.discount}%
-                  </div>
-                )}
-                <span className="text-xs font-semibold" style={{ color: selectedMonths === d.months ? '#0A84FF' : secondaryText }}>{d.months} мес</span>
-                <span className="text-sm font-bold mt-0.5" style={{ color: selectedMonths === d.months ? primaryText : secondaryText }}>₽{d.price}</span>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setPaymentModal({ plan: `${paidPlan?.name || 'Basic'} · ${selected?.months || 1} мес`, price: selected?.price || 99, months: selected?.months || 1 })}
-            className="w-full py-3 rounded-xl font-semibold text-sm text-white"
-            style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
-            {isActive ? 'Продлить подписку' : 'Выбрать тариф'}
-          </button>
-        </div>
-      </div>
+        );
+      })}
 
       <AnimatePresence>
         {paymentModal && (
@@ -334,7 +343,7 @@ export default function TabPlans() {
             price={paymentModal.price}
             months={paymentModal.months}
             onClose={() => setPaymentModal(null)}
-            onPay={createPayment}
+            onPay={(method) => createPayment(method, paymentModal.plan, paymentModal.price, paymentModal.months, paymentModal.planTrafficGb)}
           />
         )}
       </AnimatePresence>
