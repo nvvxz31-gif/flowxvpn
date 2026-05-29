@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Users, DollarSign, Activity } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const springConfig = { type: 'spring', stiffness: 300, damping: 30 };
@@ -55,18 +53,10 @@ const CARD_STYLE = {
 export default function AdminDashboard() {
   const [activePeriod, setActivePeriod] = useState('Неделя');
 
-  const { data: activeSubs = [] } = useQuery({
-    queryKey: ['admin-active-subs'],
-    queryFn: () => base44.entities.Subscription.filter({ status: 'active' }, '-created_date', 1000),
-  });
-  const { data: allTransactions = [] } = useQuery({
-    queryKey: ['admin-transactions-all'],
-    queryFn: () => base44.entities.Transaction.filter({ status: 'success' }, '-created_date', 1000),
-  });
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['admin-users-count'],
-    queryFn: () => base44.entities.User.list('-created_date', 1000),
-  });
+  // Mock data — replace with real API when backend is ready
+  const activeSubs = [];
+  const allTransactions = [];
+  const allUsers = [];
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -241,11 +231,6 @@ export default function AdminDashboard() {
                 contentStyle={{ background: '#27272a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: '#f4f4f5', fontSize: 12 }}
                 cursor={{ fill: 'rgba(255,255,255,0.03)' }}
               />
-              <Bar dataKey="users" radius={[5, 5, 0, 0]}>
-                {revenueData.map((_, idx) => (
-                  <rect key={idx} fill={`hsl(${220 + idx * 5}, 80%, ${50 + idx * 3}%)`} />
-                ))}
-              </Bar>
               <defs>
                 <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.9} />
