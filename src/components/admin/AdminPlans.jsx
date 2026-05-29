@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, X, Save } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
 
 const DEFAULT_DURATIONS = [
   { months: 1, price: 99, discount: null },
@@ -11,42 +9,23 @@ const DEFAULT_DURATIONS = [
   { months: 12, price: 899, discount: 35 },
 ];
 
+const MOCK_PLANS = [
+  { id: '1', name: 'Пробный', is_trial: true, traffic_gb: 50, days: 7, is_active: true, durations: [] },
+  { id: '2', name: 'Basic', is_trial: false, traffic_gb: 100, days: 30, price_rub: 99, is_active: true, durations: DEFAULT_DURATIONS },
+  { id: '3', name: 'Pro', is_trial: false, traffic_gb: 300, days: 30, price_rub: 249, is_active: true, durations: DEFAULT_DURATIONS },
+  { id: '4', name: 'Ultra', is_trial: false, traffic_gb: 1000, days: 30, price_rub: 499, is_active: true, durations: DEFAULT_DURATIONS },
+];
+
 export default function AdminPlans() {
-  const qc = useQueryClient();
+  const [plans, setPlans] = useState(MOCK_PLANS);
   const [editingPlan, setEditingPlan] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPlan, setNewPlan] = useState({ name: '', price_rub: '', traffic_gb: 300, days: 30 });
 
-  const { data: plans = [], isLoading } = useQuery({
-    queryKey: ['admin-plans'],
-    queryFn: () => base44.entities.Plan.list('sort_order', 100),
-  });
-
-  const createPlan = useMutation({
-    mutationFn: (data) => base44.entities.Plan.create(data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin-plans'] });
-      setShowCreateModal(false);
-      setNewPlan({ name: '', price_rub: '', traffic_gb: 300, days: 30 });
-    },
-  });
-
-  const updatePlan = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Plan.update(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['admin-plans'] });
-      setEditingPlan(null);
-    },
-  });
-
-  const deletePlan = useMutation({
-    mutationFn: (id) => base44.entities.Plan.delete(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-plans'] }),
-  });
-
   const handleCreate = () => {
     if (!newPlan.name || !newPlan.price_rub) return;
-    createPlan.mutate({
+    const plan = {
+      id: Date.now().toString(),
       ...newPlan,
       price_rub: Number(newPlan.price_rub),
       traffic_gb: Number(newPlan.traffic_gb),
@@ -54,22 +33,21 @@ export default function AdminPlans() {
       is_trial: false,
       is_active: true,
       durations: DEFAULT_DURATIONS,
-    });
+    };
+    setPlans([...plans, plan]);
+    setShowCreateModal(false);
+    setNewPlan({ name: '', price_rub: '', traffic_gb: 300, days: 30 });
   };
 
   const handleSaveEdit = () => {
     if (!editingPlan?.id) return;
-    const { id, ...data } = editingPlan;
-    updatePlan.mutate({ id, data });
+    setPlans(plans.map(p => p.id === editingPlan.id ? editingPlan : p));
+    setEditingPlan(null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-7 h-7 border-2 border-white/20 border-t-blue-400 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  const handleDelete = (id) => {
+    setPlans(plans.filter(p => p.id !== id));
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -103,7 +81,6 @@ export default function AdminPlans() {
         </div>
       )}
 
-      {/* Plans */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-8">
         {plans.map((plan, i) => (
           <motion.div key={plan.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }} className="glass-card p-5 rounded-2xl">
@@ -141,7 +118,7 @@ export default function AdminPlans() {
                 <Edit2 size={13} /> Редактировать
               </button>
               {!plan.is_trial && (
-                <button onClick={() => deletePlan.mutate(plan.id)}
+                <button onClick={() => handleDelete(plan.id)}
                   className="p-2.5 rounded-xl"
                   style={{ background: 'rgba(255,69,58,0.1)', color: '#FF453A', border: '1px solid rgba(255,69,58,0.2)' }}>
                   <Trash2 size={14} />
@@ -192,12 +169,9 @@ export default function AdminPlans() {
                 </div>
               </div>
               <motion.button whileTap={{ scale: 0.97 }} onClick={handleSaveEdit}
-                disabled={updatePlan.isPending}
                 className="w-full py-3.5 rounded-2xl font-semibold text-white flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
-                {updatePlan.isPending
-                  ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  : <><Save size={15} /> Сохранить</>}
+                <Save size={15} /> Сохранить
               </motion.button>
             </motion.div>
           </>
@@ -225,12 +199,10 @@ export default function AdminPlans() {
                   </div>
                 ))}
               </div>
-              <motion.button whileTap={{ scale: 0.97 }} onClick={handleCreate} disabled={createPlan.isPending}
+              <motion.button whileTap={{ scale: 0.97 }} onClick={handleCreate}
                 className="w-full py-3.5 rounded-2xl font-semibold text-white flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
-                {createPlan.isPending
-                  ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  : 'Создать тариф'}
+                Создать тариф
               </motion.button>
             </motion.div>
           </>
