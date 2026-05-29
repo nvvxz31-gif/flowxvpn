@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Hash, Calendar, Bell, Globe, Shield, ExternalLink, FileText, RefreshCw, Info, Mail as MailIcon, ChevronRight, X, Sun } from 'lucide-react';
+import { User, Mail, Hash, Calendar, Bell, Shield, ExternalLink, FileText, RefreshCw, Info, Mail as MailIcon, ChevronRight, X, Sun } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
 
 const springConfig = { type: 'spring', stiffness: 300, damping: 30 };
@@ -146,18 +146,6 @@ export default function UserProfile() {
           </div>
         ))}
       </motion.div>
-
-      {/* Web cabinet */}
-      <motion.a initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        href="https://my.flowx.com" target="_blank" rel="noreferrer"
-        className="flex items-center justify-between p-4 rounded-2xl mb-4"
-        style={{ background: itemBg, border: itemBorder }}>
-        <div className="flex items-center gap-3">
-          <Globe size={16} color="#0A84FF" />
-          <span className="text-sm font-medium" style={{ color: primaryText }}>Открыть веб-кабинет</span>
-        </div>
-        <ExternalLink size={14} color={secondaryText} />
-      </motion.a>
 
       {/* Legal */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
