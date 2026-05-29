@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Hash, Calendar, Bell, Shield, ExternalLink, FileText, RefreshCw, Info, Mail as MailIcon, ChevronRight, X, Sun } from 'lucide-react';
+import { User, Mail, Hash, Calendar, Bell, Shield, ExternalLink, FileText, RefreshCw, Info, Mail as MailIcon, ChevronRight, X, Sun, Languages } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
 
 const springConfig = { type: 'spring', stiffness: 300, damping: 30 };
@@ -31,7 +31,7 @@ function Toggle({ enabled, onChange, isLight }) {
 }
 
 export default function UserProfile() {
-  const { theme, toggleTheme } = useApp();
+  const { theme, lang, toggleTheme, toggleLang } = useApp();
   const isLight = theme === 'light';
   const [openLegal, setOpenLegal] = useState(null);
   const [notifications, setNotifications] = useState({ traffic: true, expiry: true, inactivity: false });
@@ -115,12 +115,28 @@ export default function UserProfile() {
           <Sun size={14} color={secondaryText} />
           <h3 className="text-sm font-semibold" style={{ color: primaryText }}>Внешний вид</h3>
         </div>
-        <div className="flex items-center justify-between py-2">
+        <div className="flex items-center justify-between py-3 border-b" style={{ borderColor: rowBorder }}>
           <div>
             <div className="text-sm" style={{ color: primaryText }}>Светлая тема</div>
             <div className="text-xs" style={{ color: secondaryText }}>Переключить оформление</div>
           </div>
           <Toggle enabled={isLight} onChange={toggleTheme} isLight={isLight} />
+        </div>
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-3">
+            <Languages size={14} color={secondaryText} />
+            <div>
+              <div className="text-sm" style={{ color: primaryText }}>Язык интерфейса</div>
+            </div>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleLang}
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold"
+            style={{ background: 'rgba(10,132,255,0.15)', color: '#0A84FF', border: '1px solid rgba(10,132,255,0.25)' }}
+          >
+            {lang === 'ru' ? 'RU → EN' : 'EN → RU'}
+          </motion.button>
         </div>
       </motion.div>
 
