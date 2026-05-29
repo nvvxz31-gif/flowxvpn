@@ -112,7 +112,7 @@ export default function TabPlans() {
   const qc = useQueryClient();
   const [selectedMonths, setSelectedMonths] = useState(1);
   const [paymentModal, setPaymentModal] = useState(null);
-  const [trialDone, setTrialDone] = useState(false);
+  const [trialDone, setTrialDone] = useState(() => !!localStorage.getItem('flowx_trial_done'));
 
   const { data: sub } = useSubscription();
 
@@ -165,6 +165,7 @@ export default function TabPlans() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['my-subscription'] });
+      localStorage.setItem('flowx_trial_done', '1');
       setTrialDone(true);
     },
   });
