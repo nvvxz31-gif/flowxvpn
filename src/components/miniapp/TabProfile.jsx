@@ -213,7 +213,7 @@ export default function TabProfile() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        href="https://my.flowx.com"
+        href="https://flowxvpn.nvvxz31.workers.dev/my"
         target="_blank"
         rel="noreferrer"
         className="flex items-center justify-between p-4 rounded-2xl mb-4"
