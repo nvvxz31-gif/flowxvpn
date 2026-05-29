@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, RefreshCw, Search, Paperclip, Star, ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
+const API_URL = 'http://31.76.76.232:8080/api';
+
 const springConfig = { type: 'spring', stiffness: 300, damping: 30 };
 
 function statusLabel(s) {
@@ -41,10 +43,24 @@ export default function AdminSupport() {
   const loadTickets = async () => {
     setLoading(true);
     try {
-      const list = await base44.entities.SupportTicket.list('-created_date', 100);
-      setTickets(list);
+      const res = await fetch(`${API_URL}/tickets`);
+      const data = await res.json();
+      const formatted = data.map(t => ({
+        id: String(t.id),
+        subject: t.message?.slice(0, 50) || 'Без темы',
+        status: t.status,
+        priority: 'medium',
+        category: 'other',
+        rating: 0,
+        messages: [{ id: '1', sender: 'user', text: t.message, timestamp: t.created_at }],
+        flow_data: { username: t.username, user_id: t.user_id },
+        user_id: t.user_id,
+        username: t.username,
+        admin_reply: t.admin_reply,
+      }));
+      setTickets(formatted);
       if (selected) {
-        const updated = list.find(t => t.id === selected.id);
+        const updated = formatted.find(t => t.id === selected.id);
         if (updated) setSelected(updated);
       }
     } catch (e) {
@@ -53,25 +69,15 @@ export default function AdminSupport() {
     setLoading(false);
   };
 
-  const updateTicket = async (id, data) => {
-    const updated = await base44.entities.SupportTicket.update(id, data);
-    await loadTickets();
-    if (selected?.id === id) setSelected(updated);
-  };
-
   const handleReply = async () => {
     if (!replyText.trim() || !selected) return;
-    const msg = {
-      id: Date.now().toString(),
-      sender: 'admin',
-      text: replyText.trim(),
-      timestamp: new Date().toISOString(),
-    };
-    await updateTicket(selected.id, {
-      messages: [...(selected.messages || []), msg],
-      status: selected.status === 'open' ? 'in_progress' : selected.status,
-    });
-    setReplyText('');
+    try {
+      await fetch(`${API_URL}/tickets/${selected.id}/reply?reply=${encodeURIComponent(replyText.trim())}`, { method: 'POST' });
+      setReplyText('');
+      await loadTickets();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const filtered = tickets.filter(t => {
