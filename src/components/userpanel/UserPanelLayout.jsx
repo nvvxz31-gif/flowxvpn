@@ -44,7 +44,7 @@ export default function UserPanelLayout() {
       {/* Desktop sidebar */}
       <div
         className="hidden md:flex w-56 h-screen flex-col py-6 flex-shrink-0"
-        style={{ background: 'rgba(18,18,20,0.95)', borderRight: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: isLight ? 'rgba(255,255,255,0.97)' : 'rgba(18,18,20,0.95)', borderRight: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.06)' }}
       >
         <div className="px-5 mb-8">
           <div className="flex items-center gap-2.5">
@@ -52,8 +52,8 @@ export default function UserPanelLayout() {
               <Zap size={16} color="white" />
             </div>
             <div>
-              <div className="text-sm font-bold" style={{ color: '#F5F5F7' }}>FlowX VPN</div>
-              <div className="text-xs" style={{ color: '#98989D' }}>my.flowx.com</div>
+              <div className="text-sm font-bold" style={{ color: isLight ? '#1C1C1E' : '#F5F5F7' }}>FlowX VPN</div>
+              <div className="text-xs" style={{ color: isLight ? '#636366' : '#98989D' }}>my.flowx.com</div>
             </div>
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function UserPanelLayout() {
                     transition={springConfig}
                   />
                 )}
-                <Icon size={16} style={{ color: isActive ? '#0A84FF' : '#98989D', position: 'relative', zIndex: 1 }} />
-                <span className="text-sm font-medium relative z-10" style={{ color: isActive ? '#F5F5F7' : '#98989D' }}>
+                <Icon size={16} style={{ color: isActive ? '#0A84FF' : (isLight ? '#636366' : '#98989D'), position: 'relative', zIndex: 1 }} />
+                <span className="text-sm font-medium relative z-10" style={{ color: isActive ? (isLight ? '#1C1C1E' : '#F5F5F7') : (isLight ? '#636366' : '#98989D') }}>
                   {item.label}
                 </span>
               </motion.button>
@@ -83,7 +83,7 @@ export default function UserPanelLayout() {
           })}
         </nav>
         <div className="px-3">
-          <button onClick={() => logout()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: '#98989D' }}>
+          <button onClick={() => logout()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: isLight ? '#636366' : '#98989D' }}>
             <LogOut size={16} /><span className="text-sm">Выйти</span>
           </button>
         </div>
@@ -103,7 +103,7 @@ export default function UserPanelLayout() {
               initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }}
               transition={springConfig}
               className="fixed left-0 top-0 bottom-0 z-50 w-64 flex flex-col py-6 md:hidden"
-              style={{ background: 'rgba(18,18,20,0.98)', borderRight: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: isLight ? 'rgba(255,255,255,0.99)' : 'rgba(18,18,20,0.98)', borderRight: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.06)' }}
             >
               <div className="px-5 mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -111,8 +111,8 @@ export default function UserPanelLayout() {
                     <Zap size={16} color="white" />
                   </div>
                   <div>
-                    <div className="text-sm font-bold" style={{ color: '#F5F5F7' }}>FlowX VPN</div>
-                    <div className="text-xs" style={{ color: '#98989D' }}>my.flowx.com</div>
+                    <div className="text-sm font-bold" style={{ color: isLight ? '#1C1C1E' : '#F5F5F7' }}>FlowX VPN</div>
+                    <div className="text-xs" style={{ color: isLight ? '#636366' : '#98989D' }}>my.flowx.com</div>
                   </div>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} style={{ color: '#98989D' }}>
@@ -130,8 +130,8 @@ export default function UserPanelLayout() {
                       className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left"
                       style={{ background: isActive ? 'linear-gradient(135deg, rgba(10,132,255,0.2), rgba(94,92,230,0.15))' : 'transparent' }}
                     >
-                      <Icon size={16} style={{ color: isActive ? '#0A84FF' : '#98989D' }} />
-                      <span className="text-sm font-medium" style={{ color: isActive ? '#F5F5F7' : '#98989D' }}>
+                      <Icon size={16} style={{ color: isActive ? '#0A84FF' : (isLight ? '#636366' : '#98989D') }} />
+                      <span className="text-sm font-medium" style={{ color: isActive ? (isLight ? '#1C1C1E' : '#F5F5F7') : (isLight ? '#636366' : '#98989D') }}>
                         {item.label}
                       </span>
                     </button>
@@ -139,7 +139,7 @@ export default function UserPanelLayout() {
                 })}
               </nav>
               <div className="px-3">
-                <button onClick={() => logout()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: '#98989D' }}>
+                <button onClick={() => logout()} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: isLight ? '#636366' : '#98989D' }}>
                   <LogOut size={16} /><span className="text-sm">Выйти</span>
                 </button>
               </div>
@@ -153,7 +153,7 @@ export default function UserPanelLayout() {
         {/* Mobile top bar */}
         <div
           className="flex items-center gap-3 px-4 py-3 md:hidden flex-shrink-0"
-          style={{ background: 'rgba(18,18,20,0.95)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          style={{ background: isLight ? 'rgba(255,255,255,0.97)' : 'rgba(18,18,20,0.95)', borderBottom: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.06)' }}
         >
           <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)' }}>
             <Menu size={18} color="#F5F5F7" />
@@ -162,7 +162,7 @@ export default function UserPanelLayout() {
             <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0A84FF, #5E5CE6)' }}>
               <Zap size={12} color="white" />
             </div>
-            <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
+            <span className="text-sm font-semibold" style={{ color: isLight ? '#1C1C1E' : '#F5F5F7' }}>
               {activeItem?.label || 'FlowX VPN'}
             </span>
           </div>

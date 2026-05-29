@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Globe, Clock, Zap, Copy, Check, QrCode } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useApp } from '@/lib/AppContext';
 
 const springConfig = { type: 'spring', stiffness: 300, damping: 30 };
 
@@ -28,14 +29,26 @@ function useCountdown(targetDate) {
 }
 
 export default function UserDashboard() {
+  const { theme } = useApp();
+  const isLight = theme === 'light';
   const { data: sub } = useSubscription();
   const [copied, setCopied] = useState(false);
+
   const usedGb = sub?.traffic_used_gb || 0;
   const totalGb = sub?.traffic_total_gb || 300;
   const usedPercent = totalGb > 0 ? Math.min((usedGb / totalGb) * 100, 100) : 0;
   const expiry = sub?.expires_at || null;
   const countdown = useCountdown(expiry);
   const planName = sub?.plan_name || 'FlowX Pro';
+
+  const primaryText = isLight ? '#1C1C1E' : '#F5F5F7';
+  const secondaryText = isLight ? '#636366' : '#98989D';
+  const cardBg = isLight ? 'rgba(255,255,255,0.95)' : '#18181B';
+  const cardBorder = isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.08)';
+  const trackBg = isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.06)';
+  const timerBg = isLight ? 'rgba(10,132,255,0.06)' : 'rgba(10,132,255,0.06)';
+  const timerBorder = isLight ? '1px solid rgba(10,132,255,0.15)' : '1px solid rgba(10,132,255,0.12)';
+  const statBg = isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)';
 
   const handleCopy = () => {
     if (sub?.vpn_config) {
@@ -48,8 +61,8 @@ export default function UserDashboard() {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: '#F5F5F7', letterSpacing: '-0.02em' }}>Добро пожаловать</h1>
-        <p className="text-sm" style={{ color: '#98989D' }}>Ваша подписка {sub?.status === 'active' ? 'активна' : sub?.status === 'trial' ? '— триал' : 'истекла'} · {planName}</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-1" style={{ color: primaryText, letterSpacing: '-0.02em' }}>Добро пожаловать</h1>
+        <p className="text-sm" style={{ color: secondaryText }}>Ваша подписка {sub?.status === 'active' ? 'активна' : sub?.status === 'trial' ? '— триал' : 'истекла'} · {planName}</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
@@ -58,7 +71,7 @@ export default function UserDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="p-5 rounded-3xl xl:col-span-2"
-          style={{ background: '#18181B', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: cardBg, border: cardBorder }}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -70,16 +83,14 @@ export default function UserDashboard() {
               />
               <span className="text-sm font-semibold" style={{ color: '#30D158' }}>Подписка активна</span>
             </div>
-            <span
-              className="text-xs px-2.5 py-1 rounded-full font-medium"
-              style={{ background: 'rgba(48,209,88,0.12)', color: '#30D158' }}
-            >
-              FlowX Pro
+            <span className="text-xs px-2.5 py-1 rounded-full font-medium"
+              style={{ background: 'rgba(48,209,88,0.12)', color: '#30D158' }}>
+              {planName}
             </span>
           </div>
 
           {/* Countdown timer */}
-          <div className="flex items-center justify-center gap-3 py-4 mb-4 rounded-2xl" style={{ background: 'rgba(10,132,255,0.06)', border: '1px solid rgba(10,132,255,0.12)' }}>
+          <div className="flex items-center justify-center gap-3 py-4 mb-4 rounded-2xl" style={{ background: timerBg, border: timerBorder }}>
             {!countdown ? (
               <div className="text-2xl font-bold font-mono" style={{ color: '#0A84FF' }}>—</div>
             ) : [
@@ -94,7 +105,7 @@ export default function UserDashboard() {
                   <div className="text-2xl font-bold font-mono" style={{ color: '#0A84FF' }}>
                     {String(val).padStart(2, '0')}
                   </div>
-                  <div className="text-xs" style={{ color: '#98989D' }}>{label}</div>
+                  <div className="text-xs" style={{ color: secondaryText }}>{label}</div>
                 </div>
               </React.Fragment>
             ))}
@@ -106,26 +117,23 @@ export default function UserDashboard() {
               { Ic: Zap, label: 'Трафик', value: `${usedGb} / ${totalGb} ГБ`, color: '#5E5CE6' },
               { Ic: Clock, label: 'Истекает', value: sub?.expires_at ? new Date(sub.expires_at).toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' }) : '—', color: '#30D158' },
             ].map(({ Ic, label, value, color }) => (
-              <div key={label} className="text-center p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center mx-auto mb-1.5"
-                  style={{ background: `${color}18` }}
-                >
+              <div key={label} className="text-center p-2 rounded-xl" style={{ background: statBg }}>
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center mx-auto mb-1.5" style={{ background: `${color}18` }}>
                   <Ic size={15} color={color} />
                 </div>
-                <div className="text-xs mb-0.5" style={{ color: '#98989D' }}>{label}</div>
-                <div className="text-xs font-semibold" style={{ color: '#F5F5F7' }}>{value}</div>
+                <div className="text-xs mb-0.5" style={{ color: secondaryText }}>{label}</div>
+                <div className="text-xs font-semibold" style={{ color: primaryText }}>{value}</div>
               </div>
             ))}
           </div>
 
           {/* Traffic bar */}
           <div className="mt-4">
-            <div className="flex justify-between text-xs mb-1.5" style={{ color: '#98989D' }}>
+            <div className="flex justify-between text-xs mb-1.5" style={{ color: secondaryText }}>
               <span>Использовано трафика</span>
               <span>{usedGb} / {totalGb} ГБ · {Math.round(usedPercent)}%</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: trackBg }}>
               <motion.div
                 className="h-full rounded-full"
                 style={{ background: 'linear-gradient(90deg, #0A84FF, #5E5CE6)' }}
@@ -143,13 +151,11 @@ export default function UserDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="p-5 rounded-2xl"
-          style={{ background: '#18181B', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: cardBg, border: cardBorder }}
         >
-          <h3 className="text-sm font-semibold mb-3" style={{ color: '#F5F5F7' }}>Ваша конфигурация</h3>
-          <div
-            className="p-3 rounded-xl font-mono text-xs mb-3 truncate"
-            style={{ background: 'rgba(255,255,255,0.04)', color: '#0A84FF', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
+          <h3 className="text-sm font-semibold mb-3" style={{ color: primaryText }}>Ваша конфигурация</h3>
+          <div className="p-3 rounded-xl font-mono text-xs mb-3 truncate"
+            style={{ background: isLight ? 'rgba(10,132,255,0.06)' : 'rgba(255,255,255,0.04)', color: '#0A84FF', border: isLight ? '1px solid rgba(10,132,255,0.15)' : '1px solid rgba(255,255,255,0.06)' }}>
             {sub?.vpn_config || 'Конфиг будет добавлен после активации...'}
           </div>
           <div className="flex gap-2">
@@ -178,14 +184,14 @@ export default function UserDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="p-5 rounded-2xl"
-          style={{ background: '#18181B', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: cardBg, border: cardBorder }}
         >
-          <h3 className="text-sm font-semibold mb-3" style={{ color: '#F5F5F7' }}>Активный сервер</h3>
+          <h3 className="text-sm font-semibold mb-3" style={{ color: primaryText }}>Активный сервер</h3>
           <div className="flex items-center gap-3 mb-3">
             <span className="text-2xl">🇳🇱</span>
             <div>
-              <div className="font-medium text-sm" style={{ color: '#F5F5F7' }}>Амстердам</div>
-              <div className="text-xs" style={{ color: '#98989D' }}>Нидерланды · 45 мс</div>
+              <div className="font-medium text-sm" style={{ color: primaryText }}>Амстердам</div>
+              <div className="text-xs" style={{ color: secondaryText }}>Нидерланды · 45 мс</div>
             </div>
             <motion.div
               className="ml-auto w-2 h-2 rounded-full"
@@ -196,7 +202,7 @@ export default function UserDashboard() {
           </div>
           <button
             className="w-full py-2.5 rounded-xl text-xs font-medium"
-            style={{ background: 'rgba(255,255,255,0.06)', color: '#98989D' }}
+            style={{ background: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.06)', color: secondaryText, border: isLight ? '1px solid rgba(0,0,0,0.07)' : 'none' }}
           >
             Сменить сервер
           </button>
